@@ -1,0 +1,66 @@
+services:
+
+  backend:
+    build:
+      context: ./medi_routines_backend/
+      target: dev
+    develop:
+      watch:
+        - path: ./medi_routines_backend/src
+          action: sync
+          target: /medi_routines_backend/src
+        - path: ./medi_routines_backend/app.js
+          action: sync
+          target: /medi_routines_backend/app.js
+        - path: ./medi_routines_backend/server.js
+          action: sync
+          target: /medi_routines_backend/server.js
+        - path: ./medi_routines_backend/package.json
+          action: rebuild
+    ports:
+      - "8000:8000"
+  
+  client:
+    build:
+      context: ./medi_routines_frontend/
+      target: dev
+    develop:
+      watch:
+        - path: ./medi_routines_frontend/src
+          action: sync
+          target: /medi_routines_frontend/src
+        - path: ./medi_routines_frontend/index.html
+          action: sync
+          target: /medi_routines_frontend/index.html
+        - path: ./medi_routines_frontend/package.json
+          action: rebuild
+    ports:
+      - "5173:5173"
+  
+  # mongodb single node replica set for development
+  mongodb:
+    image: mongodb/mongodb-community-server:8.0.21-ubuntu2204-slim
+    command: ["mongod", "--replSet", "rs0", "--port", "27017"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - medi_routines_db:/data/db
+
+  mongo-init:
+    image: mongodb/mongodb-community-server:8.0.21-ubuntu2204-slim
+    depends_on:
+      - mongodb
+    command: >
+      bash -lc '
+        until mongosh --host mongodb --port 27017 --quiet --eval "db.adminCommand(\"ping\").ok" | grep 1 >/dev/null; do
+          sleep 2
+        done;
+        mongosh --host mongodb --port 27017 --quiet --eval "
+          try { rs.status() }
+          catch (e) { rs.initiate({_id: \"rs0\", members: [{ _id: 0, host: \"mongodb:27017\" }]}) }
+        "
+      '
+    restart: "no"
+
+volumes:
+  medi_routines_db:

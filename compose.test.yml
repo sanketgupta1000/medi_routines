@@ -1,0 +1,9 @@
+# compose file for runnning tests
+# for now, since only backend has tests
+# will test backend only
+
+services:
+  backend:
+    build:
+      context: ./medi_routines_backend/
+      target: test
