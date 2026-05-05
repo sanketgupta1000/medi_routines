@@ -70,6 +70,11 @@ The dev environment is fully Dockerized — no need to install Node, MongoDB, or
 docker compose -f compose.dev.yml -p dev watch
 ```
 
+### Run tests
+```bash
+docker compose -f compose.test.yml -p test up
+```
+
 ---
 
 ## Deployment
