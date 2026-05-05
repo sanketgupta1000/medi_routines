@@ -72,7 +72,7 @@ docker compose -f compose.dev.yml -p dev watch
 
 ### Run tests
 ```bash
-docker compose -f compose.test.yml -p test up
+docker compose -f compose.test.yml -p test up --exit-code-from backend --build
 ```
 
 ---
