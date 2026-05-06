@@ -128,10 +128,8 @@ docker compose -f compose.prod.yml -p prod up -d --build
 
 ---
 
-### Subsequent Deploys
+### Subsequent Deployments via CI/CD Setup
 
-After updated code is merged into `main`, run from your local machine:
-
-```bash
-./deploy.sh
-```
+- When a pull request is created on main, tests are run via `.github/workflows/ci.yml`.
+- Only if the tests pass, is the merge allowed to `main`.
+- After merged to `main`, it is deployed to a VM in the cloud via `.github/workflows/cd.yml`.
